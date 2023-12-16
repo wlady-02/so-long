@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dwilun <dwilun@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/12/16 16:46:39 by dwilun            #+#    #+#             */
+/*   Updated: 2023/12/16 18:13:02 by dwilun           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 # include <stdlib.h>
 # include <unistd.h>
@@ -5,157 +16,116 @@
 # include <fcntl.h>
 #include "./get_next_line/get_next_line.h"
 
-// int ft_strlen_n(char *str)
-// {
-// 	int i;
-
-// 	i = 0;
-// 	while (str && str[i] && str[i] != '\n')
-// 		i++;
-// 	return (i);
-// }
-// int ft_check_out (char *str)
-// {
-// 	int i;
-
-// 	i = 0;
-// 	while (str[i] != '\0' && str[i] != '\n')
-// 	{
-// 		if (str[i] != 49)
-// 			return (0);
-// 		i++;
-// 	}
-// 	return (1);
-// }
-// int ft_check_in (char *str)
-// {
-// 	int i;
-
-// 	i = 0;
-// 	if (str[0] != 49)
-// 		return (0);
-// 	while (str[i] != '\0' && str[i] != '\n')
-// 		i++;
-// 	if (str[i - 1] != 49)
-// 		return (0);
-// 	return (1);
-// }
-// int	ft_start_old (int fd)
-// {
-// 	int		i;
-// 	int		len;
-// 	char	*line;
-
-// 	i = 0;
-// 	line = get_next_line(fd);
-// 	len = ft_strlen_n(line);
-// 	max = ft_calloc
-// 	if (ft_check_out(line) == 0)
-// 	{
-// 		printf("Error\n");
-// 		free(line);
-// 		return (0);
-// 	}
-// 	else
-// 	{
-// 		printf("%s", line);
-// 	}
-// 	while ((line = get_next_line(fd)))
-// 	{
-// 		if (ft_strlen_n(line) != len)
-// 		{
-// 			printf("Error\n");
-// 			free(line);
-// 			return (0);
-// 		}
-// 		if (ft_check_in(line) == 0)
-// 		{
-// 			printf("Error\n");
-// 			free(line);
-// 			return (0);
-// 		}
-// 		else
-// 		{
-// 			printf("%s", line);
-// 		}
-// 	}
-// 	return (1);
-// }
-
-int	ft_line_leght(int fd)
+typedef struct s_game
 {
-	
-	char	buffer[1];
-	int		bytes;
-	int		len;
+	int x;
+	int y;
+	char **map;
+} t_game;
 
-	printf("\nfd1 dentro %i\n", fd);
-	bytes = 1;
-	printf("\nfd2 dentro %i\n", fd);
-	buffer[0] = '\0';
-	printf("\nfd3 dentro %i\n", fd);
-	len = 0;
-	printf("\nfd4 dentro %i\n", fd);
-	while (bytes == 1)
-	{
-		printf("\ndio cane\n");
-		bytes = read(fd, buffer, 1);
-		if (buffer[0] != '\n')
-			len++;
-		else
-			break ;
-	}
-	return (len);
+int ft_rowLen(char *row)
+{
+	int	i;
+
+	i = 0;
+	while (row[i] != '\n' && row[i] != '\0')
+		i++;
+	return (i);
 }
-int ft_count_lines(int fd, int x)
-{
-	char	*line;
-	int 	count;
 
+int ft_countLine(int fd, int x)
+{
+	int		count;
+	char	*line;
 	count = 1;
 	while (1)
 	{
 		line = get_next_line(fd);
-		if (line == NULL)
-			break ;
-		if (ft_strlen(line) < x || (ft_strlen(line) == 1 && line[0] != '\n'))
+		// printf("%s\n", line);
+		// printf("%i\n", ft_strlen(line));
+		// printf("%i\n", x);
+		if (!line)
+			break;
+		if (ft_rowLen(line) == x)
 		{
+			count++;
 			free(line);
-			return 0;
 		}
 		else
 		{
 			free(line);
-			count++;
+			return(0);
 		}
 	}
-	return (line);
+	return (count);
 }
-int	ft_start ()
+
+
+int	ft_getWindowSize(t_game *game, char *fileMap)
+{
+	/*
+	if (fileMap == .ber)
+	*/
+	int	fd;
+	char *row;
+
+	fd = open(fileMap, O_RDONLY);
+	if (fd == -1)
+		return (0);
+	row = get_next_line(fd);
+	//printf("row = %s\n", row);
+	game->x = ft_rowLen(row);
+	free(row);
+	game->y = ft_countLine(fd, game->x);
+	close(fd);
+}
+
+int	ft_createMatrix (t_game *game, char *fileMap)
 {
 	int	fd;
-	int	x;
-	int	y;
+	int	i;
 
-	fd = open("testMap.ber", O_RDONLY);
-	if (fd < 0)
+	i = 0;
+	fd = open(fileMap, O_RDONLY);
+	while (game->map)
 	{
-		printf("Error\n");
-		return (0);
+		game->map[i] = get_next_line(fd);
+		i++;
 	}
-	printf ("\nfd fuori %i\n", fd);
-	x = ft_line_leght(fd);
-	y = ft_count_lines(fd, x);
-	printf("%i * %i", x, y);
+	return (1);
 }
 
-
-//cc main.c get_next_line/get_next_line.c get_next_line/get_next_line_utils.c && ./a.out
 int main(void) 
 {
-    
-    ft_start();
-	printf("\ngg\n");
+	//printf("main\n");
+	t_game game;
 
+	/*
+	if (argc != 2)
+		return (0);
+	ft_getWindowSize(&game, argv[1]);
+	*/
+	char *argv = "testMap.ber";
+	ft_getWindowSize(&game, argv);
+	printf("%i * %i\n", game.x, game.y);
+	game.map = (char **)malloc(sizeof(char *) * (game.y + 1));
+	printf("tab");
+	if (!game.map)
+	{
+		printf("error");
+		return (0);
+	}
+	game.map[game.y + 1] = NULL;
+	ft_createMatrix(&game, argv);
+	int i = 0;
+	while (game.map)
+	{
+		printf("game->map[%i] = %s", i,game.map[i]);
+		i++;
+	}
     return 0;
 }
+
+
+
+
