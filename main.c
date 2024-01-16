@@ -11,12 +11,20 @@
 /* ************************************************************************** */
 
 
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 3
+# endif
+
 # include <stdlib.h>
 # include <unistd.h>
 # include <stdio.h>
 # include <fcntl.h>
-#include "./get_next_line/get_next_line.h"
 
+int ft_printError (char *error)
+{
+    printf("Error:\n%s",error);
+    return (0);
+}
 int	ft_strlen(char *str)
 {
 	int	i;
@@ -30,7 +38,23 @@ int	ft_strlen(char *str)
 	
 	return (i);
 }
+char	*ft_strdup(char *s)
+{
+	int		i;
+	char	*result;
 
+	i = 0;
+	result = (char *)malloc(sizeof(char) * ft_strlen(s) + 1);
+	if (!result)
+		return (NULL);
+	while (s[i] != '\0')
+	{
+		result[i] = s[i];
+		i++;
+	}
+	result[i] = '\0';
+	return (result);
+}
 void	*ft_calloc(size_t nmemb, size_t size)
 {
 	void			*tmp;
@@ -226,7 +250,7 @@ char	*ft_strtrim(char const *s1, char const *set)
 	start = 0;
 	while (s1[start] != '\0' && ft_checkchr(set, s1[start]))
 		start++;
-	end = ft_strlen(s1) - 1;
+	end = ft_strlen((char *)s1) - 1;
 	while (end > start && ft_checkchr(set, s1[end]))
 		end--;
 	strt = (char *)malloc(sizeof(char) * (end - start) + 2);
@@ -242,6 +266,20 @@ char	*ft_strtrim(char const *s1, char const *set)
 	strt[count] = '\0';
 	return (strt);
 }
+typedef struct s_coord
+{
+    int x;
+    int y;
+} t_coord;
+
+typedef struct s_chr
+{
+    int c;
+    int p;
+    int e;
+    t_coord pCoord;
+    t_coord eCoord;
+} t_chr;
 
 
 
@@ -266,51 +304,60 @@ int ft_countLine(int fd, int x)
 {
 	int		count;
 	char	*line;
-	count = 1;
+
+    count = 1;
 	while (1)
 	{
 		line = get_next_line(fd);
-		// printf("%s\n", line);
-		// printf("%i\n", ft_strlen(line));
-		// printf("%i\n", x);
 		if (!line)
 			break;
 		if (ft_rowLen(line) == x)
 		{
 			count++;
-			printf("count: %i\n", count);
 			free(line);
 		}
 		else
 		{
 			free(line);
-			break;
+			return (0);//error
 		}
 	}
-	printf("final count: %i\n", count);
 	return (count);
 }
 
-
-int	ft_getWindowSize(t_game *game, char *fileMap)
+void ft_freeMatrix(char **matrix, int row)
 {
-	/*
-	if (fileMap == .ber)
-	*/
+    int i;
+
+    i = 0;
+    while (i < row)
+        free(matrix[i++]);
+    free(matrix);
+}
+
+
+int ft_getWindowSize(t_game *game, char *fileMap)
+{
 	int	fd;
 	char *row;
 
 	fd = open(fileMap, O_RDONLY);
 	if (fd == -1)
-		return (0);
+		return (0);//error
 	row = get_next_line(fd);
-	//printf("row = %s\n", row);
 	game->x = ft_rowLen(row);
 	free(row);
 	game->y = ft_countLine(fd, game->x);
 	close(fd);
-	return 1;
+	if (game->y == game->x 
+    || game->y < 3 
+    || game->x < 3 
+    || (game->y == 3 && game->x < 5) 
+    || (game->x == 3 && game->y < 5))
+	    return (0);
+	return (1);
 }
+
 
 int	ft_fillMap(t_game *game, char *fileMap)
 {
@@ -321,34 +368,61 @@ int	ft_fillMap(t_game *game, char *fileMap)
 
 	i = 0;
 	fd = open(fileMap, O_RDONLY);
+	if (fd == -1)
+		return (0);//error
 	y = game->y;
-	printf("y: %i\n", y);
-	printf("fd: %i\n", fd);
 	while (i < y)
 	{
 		row = get_next_line(fd);
+		if (!row)
+		    return (0);//error
 		game->map[i] = ft_strtrim(row, "\n");
-		printf("%s\n", game->map[i]);
 		free(row);
+		if (!game->map[i])
+		{	
+			ft_freeMatrix(game->map, i);
+			return (0);//error
+		}
 		i++;
 	}
+	game->map[i] = NULL;
 	close(fd);
 	return (1);
 }
-int ft_checkRow(char *row)
+
+int ft_checkRow(char *row, int len, int y, t_chr *chr)
 {
 	int i;
 
 	i = 0;
+	//printf("row: %s\n", row);
+	if (row[i] != '1' || row[len-1] != '1')
+	    return (0);//error
 	while (row[i] != '\0')
 	{
 		if (row[i] != '1' && row[i] != '0' && row[i] != 'C' && row[i] != 'E' && row[i] != 'P')
-			return (0);
+			return (0);//error
+		if (row[i] == 'E')
+		{
+		    chr->eCoord.x = i;
+		    chr->eCoord.y = y;
+		    chr->e++;
+		}
+		else if (row[i] == 'P')
+		{
+		    chr->pCoord.x = i;
+		    chr->pCoord.y = y;
+		    chr->p++;
+			//printf("y: %i x: %i\n", chr->eCoord.y, chr->eCoord.x);
+			//printf("row: %s\n", row);
+		}
+		else if (row[i] == 'C')
+		    chr->c++;
 		i++;
 	}
 	return (1);
 }
-ft_fullWall(char *row)
+int ft_fullWall(char *row)
 {
 	int i;
 
@@ -356,126 +430,141 @@ ft_fullWall(char *row)
 	while (row[i] != '\0')
 	{
 		if (row[i] != '1')
-			return (0);
+		    return (0);//error
 		i++;
 	}
 	return (1);
 }
-
-int ft_checkPlayerToExit (char **map, int x, int y)
+char **ft_cpyMatrix(char **matrix, int row)
 {
-	int i;
-	int j;
-	int p_x;
-	int p_y;
-	int e_x;
-	int e_y;
-	int now_x;
-	int now_y;
+    char    **new;
+    int     i;
 
-	i = 0;
-	while (i < y)
+    i = 0;
+    new = (char **)malloc(sizeof(char *) * (row + 1));
+    if (!new)
 	{
-		if (ft_strchr(map[i], 'E'))
-		{
-			e_x = ft_strchr(map[i], 'E') - map[i];
-			e_y = i;
-		}
-		if (ft_strchr(map[i], 'P'))
-		{
-			p_x = ft_strchr(map[i], 'P') - map[i];
-			p_y = i;
-		}
-		i++;
+		return (0);//error
 	}
-	printf("p_x: %i\n", p_x);
-	printf("p_y: %i\n", p_y);
-	printf("e_x: %i\n", e_x);
-	printf("e_y: %i\n", e_y);
-	now_x = p_x;
-	now_y = p_y;
-	if (map[now_y+1][now_x] == '1' && map[now_y-1][now_x] == '1' && map[now_y][now_x-1] == '1' && map[now_y][now_x+1] == '1')
-		return (0);
-	while (1)
-	{
-		if (map[now_y+1][now_x] == 'E')
+    while (i < row)
+    {
+        new[i] = ft_strdup(matrix[i]);
+		//printf("new[%i] = %s\n", i, new[i]);
+        if (!new[i])
 		{
-			printf("%c\n",map[now_y+1][now_x]);
-			break;
+			ft_freeMatrix(new, i);
+			return (0);//error
 		}
-		if (map[now_y-1][now_x] == 'E')
-		{
-			printf("%c\n",map[now_y-1][now_x]);
-			break;
-		}
+        i++;
+    }
 
-		if (map[now_y][now_x-1] == 'E')
-		{
-			printf("%c\n",map[now_y][now_x-1]);
-			break;
-		}
-		if (map[now_y][now_x] == 'E')
-		{
-			printf("%c\n",map[now_y][now_x+1]);
-			break;
-		}
-		if (map[now_y+1][now_x] != '1')
-			map[now_y+1][now_x] = 'P';
-		if (map[now_y-1][now_x] != '1')
-			map[now_y-1][now_x] = 'P';
-		
-		if (map[now_y][now_x-1] != '1')
-			map[now_y][now_x-1] = 'P';
-		if (map[now_y][now_x+1] != '1')
-			map[now_y][now_x+1] = 'P';
-		i = 0;
-		while (y > i)
-		{
-			printf("game->map[%i] = %s\n", i,map[i]);
-			i++;
-		}
-		break;
-	}
-	return (0);
+    new[i] = NULL;
+
+    return (new);
+    
+}
+int isValidCordinate(t_coord coord, t_coord window)
+{
+    if (coord.y < 0 || coord.x < 0)
+        return (0);//error
+    if (coord.y >= window.y || coord.x >= window.x)
+        return (0);//error
+    return (1);
 }
 
-int ft_checkMap(t_game *game)
-{
-	int x;
-	int y;
-	int i;
-	int e;
-	int p;
-	int c;
 
-	x = game->x;
-	y = game->y;
+
+
+
+
+/*
+int ft_addChr(t_game *game)
+{
+    
+}
+*/
+
+void  ft_initChr(t_chr *chr)
+{
+	chr->c = 0;
+	chr->p = 0;
+	chr->e = 0;
+	chr->pCoord.x = -1;
+	chr->pCoord.y = -1;
+	chr->eCoord.x = -1;
+	chr->eCoord.y = -1;
+}
+
+void ft_printMatrix(char **matrix, int row)
+{
+	int i;
+
 	i = 0;
-	c = 0;
-	e = 0;
-	p = 0;
-	if (ft_fullWall(game->map[0]) == 0 || ft_fullWall(game->map[y - 1]) == 0)
-		return (0);
+	while (i < row)
+	{
+		printf("matrix[%i] = %s\n", i, matrix[i]);
+		i++;
+	}
+}
+
+int ft_playerToExit (char **map, t_coord start)
+{
+	if (map[start.y][start.x] == '1' || map[start.y][start.x] == 'X')
+        return (0);//error
+	map[start.y][start.x] = 'X';
+	ft_playerToExit(map, (t_coord){start.x + 1, start.y});
+	ft_playerToExit(map, (t_coord){start.x - 1, start.y});
+	ft_playerToExit(map, (t_coord){start.x, start.y + 1});
+	ft_playerToExit(map, (t_coord){start.x, start.y - 1});
+    return (0);//error
+}
+
+int ft_checkPlayerToExit(char **map, int y,  t_coord player)
+{
+	char 	**tmp;
+	int 	i;
+	i = 0;
+	tmp = ft_cpyMatrix(map, y);
+	//ft_printMatrix(tmp, y);
+    if (!tmp)
+    {
+	    printf("ft_clone_matrix");
+	    return (0);//error
+	}
+	ft_playerToExit(tmp, player);
 	while (i < y)
 	{
-		if (ft_strchr(game->map[i], 'E'))
-			e++;
-		if (ft_strchr(game->map[i], 'P'))
-			p++;
-		if (ft_strchr(game->map[i], 'C'))
-			c++;
-		if (game->map[i][0] != '1' || game->map[i][x - 1] != '1' || !ft_checkRow(game->map[i]))
+		if (ft_strchr(tmp[i], 'C') || ft_strchr(tmp[i], 'E'))
 		{
-			printf("error\n");
-			return (0);
+			printf("ft_strchr(tmp[i], 'C')");
+			ft_freeMatrix(tmp, y);
+			return (0);//error
 		}
 		i++;
 	}
-	if (e != 1 || p != 1 || c == 0)
-		return (0);
+	ft_freeMatrix(tmp, y);
+	return (1);
+}
+int ft_checkMap(t_game *game)
+{
+	int i;
+	t_chr chr;
 
-	if (ft_checkPlayerToExit(game->map, game->x, game->y) == 0)
-		return (0);
+	i = 0;
+	if (ft_fullWall(game->map[0]) == 0 || ft_fullWall(game->map[game->y-1]) == 0)
+	    return (0);//error
+	ft_initChr(&chr);
+	while (i < game->y)
+	{
+	    if (!ft_checkRow(game->map[i], game->x, i, &chr))
+			return (0);//error
+		i++;
+	}
+	//printf("ex: %i ey: %i\npx: %i py: %i\n", chr.eCoord.x, chr.eCoord.y, chr.pCoord.x, chr.pCoord.y);
+	if (chr.e != 1 || chr.p != 1 || chr.c == 0)
+	    return (0);//error
+	if (ft_checkPlayerToExit(game->map, game->y, chr.pCoord) == 0)
+	    return (0);//error
 	return (1);
 }
 // int main() 
@@ -517,7 +606,7 @@ int ft_checkMap(t_game *game)
 //int main(int argc, char **argv)
 int main()
 {
-	printf("main\n");
+	printf("Main\n");
 	t_game game;
 	/*
 	if (argc != 2)
@@ -525,16 +614,14 @@ int main()
 	ft_getWindowSize(&game, argv[1]);
 	*/
 	char *argv = "testMap.ber";
-	ft_getWindowSize(&game, argv);
+	if (ft_getWindowSize(&game, argv) == 0)
+	    return (ft_printError("dimensioni non valide"));//error
 	printf("window: %i * %i\n", game.x, game.y);
 	game.map = (char **)malloc(sizeof(char *) * (game.y + 1));
 	if (!game.map)
-	{
-		printf("error");
-		return (0);
-	}
+		return (ft_printError("mappa non allacata"));//error
 	else
-		printf("ok\n");
+	    printf("hey?\n");
 	// game.map[game.y + 1] = NULL;
 	// for (int i = 0; i < game.y+2; i++)
 	// {
@@ -542,18 +629,33 @@ int main()
 	// }
 	// printf("%i\n", game.map[game.y + 1] == NULL);
 	//free(game.map);
-	ft_fillMap(&game, argv);
+	/*
+	if ((game.y == 3 && game.x == 5) || (game.y == 5 && game.x == 3))
+	{
+	    if (!ft_smallMap(&game, argv))
+	        return (ft_printError("mappa non valida"));//error
+	}
+	else
+	{
+	    ft_fillMap(&game, argv);
+	    if (!ft_checkMap(&game))
+            return (ft_printError("mappa non valida"));//error
+	}
+	*/
 	// int i = 0;
 	// while (game.y > i)
 	// {
 	// 	printf("game->map[%i] = %s\n", i,game.map[i]);
 	// 	i++;
 	// }
-
-	if (ft_checkMap(&game))
-		printf("map ok\n");
-	else
-		printf("map ko\n");
+	printf("map\n");
+	ft_fillMap(&game, argv);
+	printf("%s", &game.map[game.y]);
+	if (!ft_checkMap(&game))
+        return (ft_printError("mappa non valida"));//error
+    else
+        printf("map ok\n");
+	ft_printMatrix(game.map, game.y);
+	
 	return 0;
 }
-
