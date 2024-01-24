@@ -32,6 +32,13 @@
 # define S 115
 # define D 100
 
+# define UP 65362
+# define LF 65361
+# define RG 65363
+# define DW 65364
+
+# define ABS(value) (value < 0) * -1 * value + value * (value > 0)
+
 typedef struct s_coord
 {
 	int	x;
@@ -63,13 +70,13 @@ typedef struct s_game
 }	t_game;
 
 
-void	ft_freeMatrix(char **matrix);
+void	ft_freeMatrix(char **matrix, int row);
 char	*ft_strdup(char *str);
 char	*ft_strjoin(char *s1, char *s2);
 char	*ft_substr(char *str, int start, int len);
 int		ft_fillMap(t_game *game, char *fileMap);
 int		ft_checkMap(t_game *game);
-int		ft_checkRow(char *row, int len, int y, t_chr *chr);
+int		ft_checkRow(char *row, int len, t_chr *chr, int flag);
 int		ft_fullWall(char *row);
 char	**ft_cpyMatrix(char **matrix, int row);
 int		ft_playerToExit(char **map, t_coord start);

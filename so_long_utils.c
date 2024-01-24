@@ -71,13 +71,13 @@ char	*ft_strtrim(char const *s1, char const *set)
 	return (strt);
 }
 
-void	ft_freeMatrix(char **matrix)
+void	ft_freeMatrix(char **matrix, int row)
 {
 	int i;
 
-	i = 0;
-	while (matrix[i++] != NULL)
-		free(matrix[i++]);
+	i = -1;
+	while (++i < row)
+		free(matrix[i]);
 	free(matrix);
 }
 
@@ -98,7 +98,7 @@ char	**ft_cpyMatrix(char **matrix, int row)
 		//printf("new[%i] = %s\n", i, new[i]);
 		if (!new[i])
 		{
-			ft_freeMatrix(new);
+			ft_freeMatrix(new, i);
 			return (0);//error
 		}
 		i++;

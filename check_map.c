@@ -41,16 +41,16 @@ int	ft_checkPlayerToExit(char **map, int y, t_coord player)
 	{
 		if (ft_strchr(tmp[i], 'C') || ft_strchr(tmp[i], 'E'))
 		{
-			ft_freeMatrix(tmp);
+			ft_freeMatrix(tmp, i);
 			return (0);//error
 		}
 		i++;
 	}
-	ft_freeMatrix(tmp);
+	ft_freeMatrix(tmp, i);
 	return (1);
 }
 
-int ft_fullWall(char *row)
+int ex_ft_fullWall(char *row)
 {
 	int i;
 
@@ -64,33 +64,41 @@ int ft_fullWall(char *row)
 	return (1);
 }
 
-int ft_checkRow(char *row, int len, int y, t_chr *chr)
+void ft_addEntities(char entity, t_chr *chr, int x, int y)
+{
+    if (entity == 'P')
+    {
+        chr->pcoord.x = x;
+        chr->pcoord.y = y;
+        chr->p++;
+    }
+    else if (entity == 'E')
+    {
+        chr->ecoord.x = x;
+        chr->ecoord.y = y;
+        chr->e++;
+    }
+    else if (entity == 'C')
+        chr->c++;
+}
+
+int ft_checkRow(char *row, int len, t_chr *chr, int flag)
 {
 	int	i;
 
 	i = 0;
-	if (row[i] != '1' || row[len - 1] != '1')
+	if (row[0] != '1' || row[len - 1] != '1')
 		return (0);//error
-	while (row[i] != '\0')
+	while (row[++i] != '\0' && i < len - 1)
 	{
-		if (row[i] != '1' && row[i] != '0' && row[i] != 'C'
-			&& row[i] != 'E' && row[i] != 'P')
+	    if (flag == 1 && row[i] != '1')
+	        return (0);
+	    if (flag == 1)
+	        continue ;
+	    if (row[i] == 'C' || row[i] == 'E' || row[i] == 'P')
+		    ft_addEntities(row[i], chr, i, chr->i);
+		else if (row[i] != '1' && row[i] != '0')
 			return (0);//error
-		if (row[i] == 'P')
-		{
-			chr->pcoord.x = i;
-			chr->pcoord.y = y;
-			chr->p++;
-		}
-		else if (row[i] == 'E')
-		{
-			chr->ecoord.x = i;
-			chr->ecoord.y = y;
-			chr->e++;
-		}
-		else if (row[i] == 'C')
-			chr->c++;
-		i++;
 	}
 	return (1);
 }
@@ -103,23 +111,20 @@ int	ft_checkMap(t_game *game)
 	chr.c = 0;
 	chr.p = 0;
 	chr.e = 0;
-	chr.pcoord.x = -1;
-	chr.pcoord.y = -1;
-	if (ft_fullWall(game->map[0]) == 0 ||
-		ft_fullWall(game->map[game->y - 1]) == 0)
-		return (0);//error
-	while (chr.i < game->y)
+	if (!ft_checkRow(game->map[0], game->x, &chr, 1) ||
+	    !ft_checkRow(game->map[game->y - 1], game->x, &chr, 1))
+	    return (0);
+	while (++chr.i < game->y - 1)
 	{
-		if (!ft_checkRow(game->map[chr.i], game->x, chr.i, &chr))
+		if (!ft_checkRow(game->map[chr.i], game->x, &chr, 0))
 			return (0);//error
-		chr.i++;
 	}
 	if (chr.e != 1 || chr.p != 1 || chr.c == 0)
 	    return (0);//error
 	game->collectible = chr.c;
 	game->player = chr.pcoord;
 	game->exit = chr.ecoord;
-	if (ft_checkPlayerToExit(game->map, game->y, chr.pcoord) == 0)
+	if (ft_checkPlayerToExit(game->map, game->y, game->player) == 0)
 	    return (0);//error
 	return (1);
 }

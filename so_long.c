@@ -38,6 +38,9 @@ void	ft_printMatrix(char **matrix, int row)
 //funzioni tmp
 
 // funzioni da spostare
+
+
+
 void  ft_put_img(t_game *game, int index, int y, int x)
 {
 	mlx_put_image_to_window(game->mlx, game->win,
@@ -51,7 +54,6 @@ int	ft_load_images(t_game *game)
 	i = 0;
 	while (i < game->y)
 	{
-		//ft_put_row(&game, i);
 		x = 0;
 		while (game->map[i][x] != '\0')
 		{
@@ -136,10 +138,40 @@ void	ft_printmoves(t_game *game)
 	write(1, " move(s)\n", 9);
 	free(str);
 }
+int	ft_destroy(t_game *game)
+{
+	int	i;
+
+	i = 0;
+	ft_freeMatrix(game->map, game->y);
+	while (i < 6)
+		mlx_destroy_image(game->mlx, game->textures[i++]);
+	mlx_destroy_window(game->mlx, game->win);
+	mlx_destroy_display(game->mlx);
+	free(game->mlx);
+	free(game);
+	exit(0);
+}
+void	ft_victory(t_game *game)
+{
+	char	*str;
+	int		len;
+
+	str = ft_itoa(game->moves);
+	len = ft_strlen(str);
+	write(1, "You win!\n", 9);
+	write(1, "You cleared the level in only ", 30);
+	write(1, str, len);
+	write(1, " moves!\n", 8);
+	free(str);
+	ft_destroy(game);
+	exit(0);
+}
+
+/*
 
 void ft_move_up(t_game *game)
 {
-	printf("up\n");
 	if (game->map[game->player.y - 1][game->player.x] == '1')
 		return ;
 	else if (game->map[game->player.y - 1][game->player.x] == 'C')
@@ -159,15 +191,13 @@ void ft_move_up(t_game *game)
 	if (game->map[game->player.y + 1][game->player.x] == 'E'
 		&& game->collectible != 0)
 		{
-			ft_put_img(game, 4, game->player.y, game->player.x);
-			printf("stronzo");
+			ft_put_img(game, 4, game->player.y + 1, game->player.x);
 		}
 	game->moves++;
 	ft_printmoves(game);
 }
 void ft_move_left(t_game *game)
 {
-	printf("left\n");
 	if (game->map[game->player.y][game->player.x - 1] == '1')
 		return ;
 	else if (game->map[game->player.y][game->player.x - 1] == 'C')
@@ -186,16 +216,12 @@ void ft_move_left(t_game *game)
 	ft_put_img(game, 0, game->player.y, game->player.x);
 	if (game->map[game->player.y][game->player.x + 1] == 'E'
 		&& game->collectible != 0)
-		{
-			ft_put_img(game, 4, game->player.y, game->player.x);
-			printf("stronzo");
-		}
+			ft_put_img(game, 4, game->player.y, game->player.x + 1);
 	game->moves++;
 	ft_printmoves(game);
 }
 void ft_move_right(t_game *game)
 {
-	printf("right\n");
 	if (game->map[game->player.y][game->player.x + 1] == '1')
 		return ;
 	else if (game->map[game->player.y][game->player.x + 1] == 'C')
@@ -205,29 +231,23 @@ void ft_move_right(t_game *game)
 	}
 	else if (game->map[game->player.y][game->player.x + 1] == 'E' &&
 			game->collectible == 0)
-		{
+	{
 			printf("Victory");
 			return ;
-		}
+	}
+	else
+		printf("collectible = %i\n", game->collectible);
 	ft_put_img(game, 2, game->player.y, game->player.x);
 	game->player.x++;
 	ft_put_img(game, 0, game->player.y, game->player.x);
 	if (game->map[game->player.y][game->player.x - 1] == 'E'
 		&& game->collectible != 0)
-		{
-			ft_put_img(game, 4, game->player.y, game->player.x);
-			printf("stronzo");
-		}
-	else
-	{
-		printf("%c\n", game->map[game->player.y][game->player.x - 1]);
-	}
+			ft_put_img(game, 4, game->player.y, game->player.x - 1);
 	game->moves++;
 	ft_printmoves(game);
 }
 void ft_move_down(t_game *game)
 {
-	printf("down\n");
 	if (game->map[game->player.y + 1][game->player.x] == '1')
 		return ;
 	else if (game->map[game->player.y + 1][game->player.x] == 'C')
@@ -246,41 +266,51 @@ void ft_move_down(t_game *game)
 	ft_put_img(game, 0, game->player.y, game->player.x);
 	if (game->map[game->player.y - 1][game->player.x] == 'E'
 		&& game->collectible != 0)
-		{
-			ft_put_img(game, 4, game->player.y, game->player.x);
-			printf("stronzo");
-		}
-		
+			ft_put_img(game, 4, game->player.y - 1, game->player.x);
 	game->moves++;
 	ft_printmoves(game);
 }
 
-int	ft_destroy(t_game *game)
+*/
+void ft_move_player(t_game *game, int x, int y)
 {
-	int	i;
-
-	i = 0;
-	ft_freeMatrix(game->map);
-	while (i < 6)
-		mlx_destroy_image(game->mlx, game->textures[i++]);
-	mlx_destroy_window(game->mlx, game->win);
-	mlx_destroy_display(game->mlx);
-	free(game->mlx);
-	free(game);
-	exit(0);
+	if (game->map[game->player.y + y][game->player.x + x] == '1')
+		return ;
+	else if (game->map[game->player.y + y][game->player.x + x] == 'C')
+	{
+		game->map[game->player.y + y][game->player.x + x] = '0';
+		game->collectible--;
+	}
+	else if (game->map[game->player.y + y][game->player.x + x] == 'E' &&
+			game->collectible == 0)
+	{
+			ft_victory(game);
+			return ;
+	}
+	ft_put_img(game, 2, game->player.y, game->player.x);
+	game->player.y += y; 
+	game->player.x += x; 
+	ft_put_img(game, 0, game->player.y, game->player.x);
+	if (game->map[game->player.y + (y * -1)][game->player.x + (x * -1)] == 'E'
+		&& game->collectible != 0)
+			ft_put_img(game, 4, game->player.y + (y * -1), game->player.x + (x * -1));
+	game->moves++;
+	ft_printmoves(game);
 }
+
+
 int	ft_getInput(int keycode, t_game *game)
 {
 	if (keycode == ESC)
 		ft_destroy(game);
-	else if (keycode == W)
-		ft_move_up(game);
-	else if (keycode == A)
-		ft_move_left(game);
-	else if (keycode == D)
-		ft_move_right(game);
-	else if (keycode == S)
-		ft_move_down(game);
+	else if (keycode == W || keycode == UP)
+		ft_move_player(game, 0, -1);
+	else if (keycode == A || keycode == LF)
+		ft_move_player(game, -1, 0);
+	else if (keycode == D || keycode == RG)
+		ft_move_player(game, 1, 0);
+	else if (keycode == S || keycode == DW)
+		ft_move_player(game, 0, 1);
 	return (0);
 }
 // funzioni da spostare
@@ -289,10 +319,12 @@ int	ft_getInput(int keycode, t_game *game)
 int main()
 {
 	t_game	*game;
+
 	/*
 	if (argc != 2)
 		return (0);
 	ft_getWindowSize(&game, argv[1]);
+
 	*/
 	game = malloc(sizeof(t_game));
 	if (!game)

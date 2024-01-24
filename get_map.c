@@ -18,21 +18,23 @@ int	ft_fillMap(t_game *game, char *fileMap)
 	int		i;
 	char	*row;
 
-	i = 0;
+	i = -1;
 	fd = open(fileMap, O_RDONLY);
-	while (i < game->y)
+	while (++i < game->y)
 	{
 		row = get_next_line(fd);
 		if (!row)
+		{
+			ft_freeMatrix(game->map, i);
 		    return (0);//error
+		}
 		game->map[i] = ft_strtrim(row, "\n");
 		free(row);
 		if (!game->map[i])
 		{
-			ft_freeMatrix(game->map);
+			ft_freeMatrix(game->map, i);
 			return (0);//error
 		}
-		i++;
 	}
 	game->map[i] = NULL;
 	close(fd);
