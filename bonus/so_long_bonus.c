@@ -1,31 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.c                                          :+:      :+:    :+:   */
+/*   so_long_bonus.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dwilun <dwilun@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 16:46:39 by dwilun            #+#    #+#             */
-/*   Updated: 2024/01/27 12:16:35 by dwilun           ###   ########.fr       */
+/*   Updated: 2024/01/27 16:35:18 by dwilun           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "so_long.h"
-
-int	ft_printError(char *error)
-{
-    printf("Error:\n%s",error);
-    return (0);
-}
-
-
-
+#include "so_long_bonus.h"
 
 void	ft_put_img(t_game *game, int index, int y, int x)
 {
 	mlx_put_image_to_window(game->mlx, game->win,
 		game->textures[index], x * SIZE, y * SIZE);
 }
+
 void	ft_load_images(t_game *game)
 {
 	int	i;
@@ -40,18 +32,21 @@ void	ft_load_images(t_game *game)
 			if (game->map[i][x] == 'P')
 				ft_put_img(game, 0, i, x);
 			else if (game->map[i][x] == '1')
-				ft_put_img(game, 1, i, x);
+				ft_put_img(game, 5, i, x);
 			else if (game->map[i][x] == '0')
-				ft_put_img(game, 2, i, x);
+				ft_put_img(game, 6, i, x);
 			else if (game->map[i][x] == 'C')
-				ft_put_img(game, 3, i, x);
+				ft_put_img(game, 7, i, x);
 			else if (game->map[i][x] == 'E')
-				ft_put_img(game, 4, i, x);
+				ft_put_img(game, 9, i, x);
+			else if (game->map[i][x] == 'N')
+				ft_put_img(game, 11, i, x);
 			x++;
 		}
 		i++;
 	}
 }
+
 void	ft_check_img(t_game *game, int index, char *path)
 {
 	int	size;
@@ -72,15 +67,23 @@ void	ft_check_img(t_game *game, int index, char *path)
 		ft_error("Error\nTexture non valida", 6, game);
 	}
 }
+
 void	ft_init_imgs(t_game *game)
 {
-	//game->textures[7] = NULL;
 	ft_check_img(game, 0, "./textures/babbo.xpm");
-	ft_check_img(game, 1, "./textures/tree.xpm");
-	ft_check_img(game, 2, "./textures/floor.xpm");
-	ft_check_img(game, 3, "./textures/bimbo.xpm");
-	ft_check_img(game, 4, "./textures/exitc.xpm");
-	ft_check_img(game, 5, "./textures/exito.xpm");
+	ft_check_img(game, 1, "./textures/bab2.xpm");
+	ft_check_img(game, 2, "./textures/bab3.xpm");
+	ft_check_img(game, 3, "./textures/bab4.xpm");
+	ft_check_img(game, 4, "./textures/bab5.xpm");
+	ft_check_img(game, 5, "./textures/tree.xpm");
+	ft_check_img(game, 6, "./textures/floor.xpm");
+	ft_check_img(game, 7, "./textures/bimbo.xpm");
+	ft_check_img(game, 8, "./textures/bim2.xpm");
+	ft_check_img(game, 9, "./textures/exitc.xpm");
+	ft_check_img(game, 10, "./textures/exito.xpm");
+	ft_check_img(game, 11, "./textures/pula.xpm");
+	ft_check_img(game, 12, "./textures/pul2.xpm");
+	ft_check_img(game, 13, "./textures/pul3.xpm");
 }
 
 //int main(int argc, char **argv)
@@ -93,7 +96,7 @@ int main()
 		return (0);
 	ft_getwindowsize(&game, argv[1]);
 	*/
-	char *argv = "./map/testMap.ber";
+	char *argv = "./map/42.ber";
 	game = malloc(sizeof(t_game));
 	if (!game)
 		ft_error("Error\nAllocazione non riuscita", 1, game);
@@ -110,6 +113,8 @@ int main()
 	ft_load_images(game);
 	mlx_hook(game->win, KeyRelease, KeyReleaseMask, ft_get_input, game);
 	mlx_hook(game->win, 17, 1L << 2, ft_destroy, game);
+	game->frame = 0;
+	mlx_loop_hook(game->mlx, ft_animate, game);
 	mlx_loop(game->mlx);
 	ft_destroy(game);
 }

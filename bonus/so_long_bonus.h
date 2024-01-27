@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.h                                          :+:      :+:    :+:   */
+/*   so_long_bonus.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dwilun <dwilun@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 09:46:46 by dwilun            #+#    #+#             */
-/*   Updated: 2024/01/27 12:34:53 by dwilun           ###   ########.fr       */
+/*   Updated: 2024/01/27 15:25:31 by dwilun           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include <fcntl.h>
 # include <X11/X.h>
 # include <X11/keysym.h>
-# include "./minilibx-linux/mlx.h"
+# include "../minilibx-linux/mlx.h"
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 1
@@ -60,17 +60,19 @@ typedef struct s_game
 	char	**map;
 	void	*mlx;
 	void	*win;
-	void	*textures[15];
+	void	*textures[14];
 	int		collectible;
 	int		moves;
 	t_coord	player;
 	t_coord	exit;
+	int frame;
 }	t_game;
 
 void	ft_error(char *str, int num, t_game *game);
 void	ft_put_img(t_game *game, int index, int y, int x);
 int		ft_get_input(int keycode, t_game *game);
 void	ft_victory(t_game *game);
+void	ft_gameover(t_game *game);
 int		ft_destroy(t_game *game);
 void	ft_free_matrix(char **matrix, int row);
 char	*ft_itoa(int num);
@@ -87,6 +89,8 @@ char	*ft_strtrim(char const *s1, char const *set);
 
 void 	ft_getwindowsize(t_game *game, char *fileMap);
 void	ft_printMatrix(char **matrix, int row);
+int 	ft_animate(t_game *game);
+
 
 char	*get_next_line(int fd);
 char	*ft_readline(int fd, char *buffer, char *fcontent);

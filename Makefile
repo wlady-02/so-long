@@ -1,45 +1,51 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: dwilun <dwilun@student.42.fr>              +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/01/27 12:09:59 by dwilun            #+#    #+#              #
+#    Updated: 2024/01/27 12:42:51 by dwilun           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME = so_long
-MLX_DIR = ./minilibx
-MLX = $(MLX_DIR)/libmlx.a
-MLXFLAGS = -lX11 -lXext -lm
-CC = cc -g -Wall -Wextra -Werror
-SRC = so_long.c so_long_utils.c  ./get_next_line/get_next_line.c \
+
+SRCS = so_long.c so_long_utils.c  ./get_next_line/get_next_line.c \
 ./get_next_line/get_next_line_utils.c \
-	get_map.c check_map.c
-OBJ = $(SRC:.c=.o)
-FT_PRINTF = printf
+	get_map.c check_map.c move.c close.c
 
-all: $(NAME)
+BSRCS = ./bonus/so_long_bonus.c \
+		./bonus/so_long_utils_bonus.c  \
+		./bonus/get_next_line/get_next_line_bonus.c \
+		./bonus/get_next_line/get_next_line_utils_bonus.c \
+		./bonus/get_map_bonus.c \
+		./bonus/check_map_bonus.c \
+		./bonus/move_bonus.c \
+		./bonus/close_bonus.c \
+		./bonus/animate_bonus.c
 
-$(NAME): $(OBJ)
-	@make all -C $(FT_PRINTF)
-	@make all -C $(MLX_DIR)
-	@$(CC) $(OBJ) printf/libftprintf.a $(MLX) $(MLXFLAGS) -o $(NAME)
-	@echo "Compiled "$(NAME)" successfully!"
+OBJS = $(SRCS:.c=.o)
+BOBJS = $(BSRCS:.c=.o)
+MLX = "https://github.com/42Paris/minilibx-linux.git"
+MLX_DIR = minilibx-linux
+FLAGS = -Lminilibx-linux -lmlx -lX11 -lXext
+all: $(MLX_DIR) $(NAME)
+$(MLX_DIR):
+	@git clone $(MLX)
+	@cd $(MLX_DIR) && ./configure
 
-%.o: %.c
-	@$(CC) -c $< -o $@
+$(NAME): $(OBJS)
+	cc -Wall -Wextra -Werror $(OBJS) $(FLAGS) -o $(NAME) -g
 
-bonus : all
+bonus: $(MLX_DIR) $(BOBJS)
+	cc -Wall -Wextra -Werror $(BOBJS) $(FLAGS) -o $(NAME)
 
 clean:
-	@make clean -C $(FT_PRINTF)
-	@rm -f $(OBJ)
-	@echo "Cleaned objects successfully!"
-    
+	rm -f $(OBJS) $(BOBJS)
+
 fclean: clean
-	@rm -f $(NAME)
-	@make fclean -C $(FT_PRINTF)
-	@make clean -C $(MLX_DIR)
-	@echo "Cleaned "$(NAME)" successfully!"
-    
+	rm -f $(NAME)
+
 re: fclean all
-	make re -C $(FT_PRINTF)
-val:
-	valgrind --leak-check=full --show-leak-kinds=all ./so_long $(file)
-replay:
-	@rm -f $(NAME)
-	@$(CC) $(SRC) ft_printf/libftprintf.a $(MLX) $(MLXFLAGS) -o $(NAME)
-	@echo "Let's  gooo!!"
-  
-.PHONY: all clean fclean bonus re replay

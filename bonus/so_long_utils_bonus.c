@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long_utils.c                                    :+:      :+:    :+:   */
+/*   so_long_utils_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dwilun <dwilun@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 09:39:49 by dwilun            #+#    #+#             */
-/*   Updated: 2024/01/27 10:13:04 by dwilun           ###   ########.fr       */
+/*   Updated: 2024/01/27 16:31:04 by dwilun           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "so_long.h"
+#include "so_long_bonus.h"
 
 char	*ft_strdup(char *s)
 {
@@ -70,8 +70,6 @@ char	*ft_strtrim(char const *s1, char const *set)
 	strt[count] = '\0';
 	return (strt);
 }
-
-
 
 char	**ft_cpymatrix(char **matrix, int row)
 {
