@@ -76,7 +76,6 @@ void	ft_free_matrix(char **matrix, int row);
 char	*ft_itoa(int num);
 char	*ft_strdup(char *str);
 char	*ft_strjoin(char *s1, char *s2);
-char	*ft_substr(char *str, int start, int len);
 void	ft_fill_map(t_game *game, char *fileMap);
 int		ft_check_map(t_game *game);
 int		ft_check_row(char *row, int len, t_chr *chr, int flag);
@@ -84,8 +83,9 @@ char	**ft_cpymatrix(char **matrix, int row);
 int		ft_player_to_exit(char **map, t_coord start);
 int		ft_check_exit(char **map, int y, t_coord player);
 char	*ft_strtrim(char const *s1, char const *set);
-
-void 	ft_getwindowsize(t_game *game, char *fileMap);
+int		ft_strncmp(const char *s1, const char *s2, size_t n);
+void	ft_init_check(int argc, char **argv, t_game *game);
+void	ft_getwindowsize(t_game *game, char *fileMap);
 void	ft_printMatrix(char **matrix, int row);
 
 char	*get_next_line(int fd);
@@ -96,6 +96,5 @@ char	*ft_strchr(const char *s, int c);
 int		ft_strlen(char *str);
 char	*ft_freecontent(char *fcontent);
 char	*ft_extractline(char *fcontent);
-
 
 #endif

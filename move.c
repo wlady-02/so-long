@@ -45,7 +45,8 @@ void	ft_move_player(t_game *game, int x, int y)
 	ft_put_img(game, 0, game->player.y, game->player.x);
 	if (game->map[game->player.y + (y * -1)][game->player.x + (x * -1)] == 'E'
 		&& game->collectible != 0)
-		ft_put_img(game, 4, game->player.y + (y * -1), game->player.x + (x * -1));
+		ft_put_img(game, 4, game->player.y + (y * -1),
+			game->player.x + (x * -1));
 	game->moves++;
 	ft_printmoves(game);
 }

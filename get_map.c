@@ -33,7 +33,7 @@ void	ft_fill_map(t_game *game, char *fileMap)
 	if (i < game->y)
 	{
 		ft_free_matrix(game->map, i);
-		ft_error("Error\nAllocazione non riuscita", 4, game);
+		ft_error("Error\nAllocazione non riuscita", 7, game);
 	}
 	game->map[i] = NULL;
 	close(fd);
@@ -89,5 +89,5 @@ void	ft_getwindowsize(t_game *game, char *fileMap)
 		|| game->x < 3
 		|| (game->y == 3 && game->x < 5)
 		|| (game->x == 3 && game->y < 5))
-		ft_error("Error\nDimensioni mappa non valide", 2, game);
+		ft_error("Error\nDimensioni mappa non valide", 5, game);
 }

@@ -12,9 +12,13 @@
 
 NAME = so_long
 
-SRCS = so_long.c so_long_utils.c  ./get_next_line/get_next_line.c \
-./get_next_line/get_next_line_utils.c \
-	get_map.c check_map.c move.c close.c
+SRCS = so_long.c so_long_utils.c  \
+	./get_next_line/get_next_line.c \
+	./get_next_line/get_next_line_utils.c \
+	get_map.c \
+	check_map.c \
+	move.c \
+	close.c
 
 BSRCS = ./bonus/so_long_bonus.c \
 		./bonus/so_long_utils_bonus.c  \
@@ -37,7 +41,7 @@ $(MLX_DIR):
 	@cd $(MLX_DIR) && ./configure
 
 $(NAME): $(OBJS)
-	cc -Wall -Wextra -Werror $(OBJS) $(FLAGS) -o $(NAME) -g
+	cc -g -Wall -Wextra -Werror $(OBJS) $(FLAGS) -o $(NAME)
 
 bonus: $(MLX_DIR) $(BOBJS)
 	cc -Wall -Wextra -Werror $(BOBJS) $(FLAGS) -o $(NAME)

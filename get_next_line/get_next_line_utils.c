@@ -18,11 +18,7 @@ int	ft_strlen(char *str)
 
 	i = 0;
 	while (str && str[i])
-	{
-		//printf("ft_strlen : %c\n", str[i]);
 		i++;
-	}
-	
 	return (i);
 }
 

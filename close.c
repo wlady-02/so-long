@@ -12,8 +12,6 @@
 
 #include "so_long.h"
 
-
-
 void	ft_free_matrix(char **matrix, int row)
 {
 	int	i;
@@ -52,16 +50,13 @@ void	ft_victory(t_game *game)
 	write(1, " moves!\n", 8);
 	free(str);
 	ft_destroy(game);
-	exit(0);
 }
 
 void	ft_error(char *str, int num, t_game *game)
 {
-	if (num == 1)
-		perror(str);
-	else if (num == 2 || num == 3 || num == 4 || num == 6)
+	if (num == 5 || num == 6 || num == 7 || num == 9)
 		free(game);
-	else if (num == 5)
+	else if (num == 8)
 	{
 		ft_free_matrix(game->map, game->y);
 		free(game);
@@ -70,3 +65,30 @@ void	ft_error(char *str, int num, t_game *game)
 	exit(num);
 }
 
+void	ft_init_check(int argc, char **argv, t_game *game)
+{
+	int	fd;
+	int	len;
+
+	if (argc != 2)
+		ft_error("Error\nNumero di argomenti non valido", 1, game);
+	len = ft_strlen(argv[1]);
+	while (len >= 0)
+	{
+		if (argv[1][len] == '.')
+		{
+			if (argv[1][len + 1] != 'b'
+				&& argv[1][len + 2] != 'e' && argv[1][len + 3] != 'r')
+				ft_error("Error\nEstensione non valida", 2, game);
+			len = -100;
+			break ;
+		}
+		len--;
+	}
+	if (len != -100)
+		ft_error("Error\nInput non valido", 2, game);
+	fd = open(argv[1], O_RDONLY);
+	if (fd < 0)
+		ft_error("Error\nFile non valido", 3, game);
+	close(fd);
+}

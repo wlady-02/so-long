@@ -12,6 +12,27 @@
 
 #include "so_long.h"
 
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	size_t	i;
+
+	i = 0;
+	if (s1 == NULL || s2 == NULL)
+	{
+		printf("s1: %s\n", s1);
+		return (-1);
+	}
+	if (n <= 0)
+		return (0);
+	while (i < n && s1[i] == s2[i] && (s1[i] || s2[i]))
+		i++;
+	printf("s1: %c\n", s1[i]);
+	if (i == n)
+		return ((unsigned char)s1[i - 1] - (unsigned char)s2[i - 1]);
+	else
+		return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+}
+
 char	*ft_strdup(char *s)
 {
 	int		i;
@@ -30,20 +51,6 @@ char	*ft_strdup(char *s)
 	return (result);
 }
 
-static int	ft_checkchr(char const *s, char const c)
-{
-	int	i;
-
-	i = 0;
-	while (s[i] != '\0')
-	{
-		if (s[i] == c)
-			return (1);
-		i++;
-	}
-	return (0);
-}
-
 char	*ft_strtrim(char const *s1, char const *set)
 {
 	int		start;
@@ -52,10 +59,10 @@ char	*ft_strtrim(char const *s1, char const *set)
 	char	*strt;
 
 	start = 0;
-	while (s1[start] != '\0' && ft_checkchr(set, s1[start]))
+	while (s1[start] != '\0' && ft_strchr(set, s1[start]) != NULL)
 		start++;
 	end = ft_strlen((char *)s1) - 1;
-	while (end > start && ft_checkchr(set, s1[end]))
+	while (end > start && ft_strchr(set, s1[end]) != NULL)
 		end--;
 	strt = (char *)malloc(sizeof(char) * (end - start) + 2);
 	if (!strt)
@@ -70,8 +77,6 @@ char	*ft_strtrim(char const *s1, char const *set)
 	strt[count] = '\0';
 	return (strt);
 }
-
-
 
 char	**ft_cpymatrix(char **matrix, int row)
 {

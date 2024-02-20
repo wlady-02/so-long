@@ -12,20 +12,12 @@
 
 #include "so_long.h"
 
-int	ft_printError(char *error)
-{
-    printf("Error:\n%s",error);
-    return (0);
-}
-
-
-
-
 void	ft_put_img(t_game *game, int index, int y, int x)
 {
 	mlx_put_image_to_window(game->mlx, game->win,
 		game->textures[index], x * SIZE, y * SIZE);
 }
+
 void	ft_load_images(t_game *game)
 {
 	int	i;
@@ -52,6 +44,7 @@ void	ft_load_images(t_game *game)
 		i++;
 	}
 }
+
 void	ft_check_img(t_game *game, int index, char *path)
 {
 	int	size;
@@ -69,43 +62,38 @@ void	ft_check_img(t_game *game, int index, char *path)
 		mlx_destroy_window(game->mlx, game->win);
 		mlx_destroy_display(game->mlx);
 		free(game->mlx);
-		ft_error("Error\nTexture non valida", 6, game);
+		ft_error("Error\nTexture non valida", 9, game);
 	}
 }
+
 void	ft_init_imgs(t_game *game)
 {
-	//game->textures[7] = NULL;
-	ft_check_img(game, 0, "./textures/babbo.xpm");
-	ft_check_img(game, 1, "./textures/tree.xpm");
+	ft_check_img(game, 0, "./textures/player.xpm");
+	ft_check_img(game, 1, "./textures/wall.xpm");
 	ft_check_img(game, 2, "./textures/floor.xpm");
-	ft_check_img(game, 3, "./textures/bimbo.xpm");
+	ft_check_img(game, 3, "./textures/coll.xpm");
 	ft_check_img(game, 4, "./textures/exitc.xpm");
 	ft_check_img(game, 5, "./textures/exito.xpm");
 }
 
-//int main(int argc, char **argv)
-int main()
+int	main(int argc, char **argv)
 {
 	t_game	*game;
 
-	/*
-	if (argc != 2)
-		return (0);
-	ft_getwindowsize(&game, argv[1]);
-	*/
-	char *argv = "./map/testMap.ber";
+	ft_init_check(argc, argv, game);
 	game = malloc(sizeof(t_game));
 	if (!game)
-		ft_error("Error\nAllocazione non riuscita", 1, game);
-	ft_getwindowsize(game, argv);
+		ft_error("Error\nAllocazione non riuscita", 4, game);
+	ft_getwindowsize(game, argv[1]);
 	game->map = (char **)malloc(sizeof(char *) * (game->y + 1));
 	if (!game->map)
-		ft_error("Error\nAllocazione non riuscita", 3, game);
-	ft_fill_map(game, argv);
+		ft_error("Error\nAllocazione non riuscita", 6, game);
+	ft_fill_map(game, argv[1]);
 	if (!ft_check_map(game))
-		ft_error("Error\nMappa non valida", 5, game);
+		ft_error("Error\nMappa non valida", 8, game);
 	game->mlx = mlx_init();
-	game->win = mlx_new_window(game->mlx, game->x*SIZE, game->y*SIZE, "so_long");
+	game->win = mlx_new_window(game->mlx, game->x * SIZE, game->y * SIZE,
+			"so_long");
 	ft_init_imgs(game);
 	ft_load_images(game);
 	mlx_hook(game->win, KeyRelease, KeyReleaseMask, ft_get_input, game);
