@@ -65,13 +65,13 @@ void	ft_error(char *str, int num, t_game *game)
 	exit(num);
 }
 
-void	ft_init_check(int argc, char **argv, t_game *game)
+void	ft_init_check(int argc, char **argv)
 {
 	int	fd;
 	int	len;
 
 	if (argc != 2)
-		ft_error("Error\nNumero di argomenti non valido", 1, game);
+		ft_error("Error\nNumero di argomenti non valido", 1, NULL);
 	len = ft_strlen(argv[1]);
 	while (len >= 0)
 	{
@@ -79,16 +79,16 @@ void	ft_init_check(int argc, char **argv, t_game *game)
 		{
 			if (argv[1][len + 1] != 'b'
 				&& argv[1][len + 2] != 'e' && argv[1][len + 3] != 'r')
-				ft_error("Error\nEstensione non valida", 2, game);
+				ft_error("Error\nEstensione non valida", 2, NULL);
 			len = -100;
 			break ;
 		}
 		len--;
 	}
 	if (len != -100)
-		ft_error("Error\nInput non valido", 2, game);
+		ft_error("Error\nInput non valido", 2, NULL);
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
-		ft_error("Error\nFile non valido", 3, game);
+		ft_error("Error\nFile non valido", 3, NULL);
 	close(fd);
 }

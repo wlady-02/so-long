@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   so_long_bonus.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dwilun <dwilun@student.42.fr>              +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/20 09:46:46 by dwilun            #+#    #+#             */
-/*   Updated: 2024/01/27 15:25:31 by dwilun           ###   ########.fr       */
+/*   Created: 2024/02/26 21:21:12 by marvin            #+#    #+#             */
+/*   Updated: 2024/02/26 21:21:12 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SO_LONG_H
-# define SO_LONG_H
-
+#ifndef SO_LONG_BONUS_H
+# define SO_LONG_BONUS_H
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
@@ -65,7 +64,7 @@ typedef struct s_game
 	int		moves;
 	t_coord	player;
 	t_coord	exit;
-	int frame;
+	int		frame;
 }	t_game;
 
 void	ft_error(char *str, int num, t_game *game);
@@ -86,11 +85,11 @@ char	**ft_cpymatrix(char **matrix, int row);
 int		ft_player_to_exit(char **map, t_coord start);
 int		ft_check_exit(char **map, int y, t_coord player);
 char	*ft_strtrim(char const *s1, char const *set);
-
-void 	ft_getwindowsize(t_game *game, char *fileMap);
+void	ft_init_check(int argc, char **argv);
+void	ft_getwindowsize(t_game *game, char *fileMap);
 void	ft_printMatrix(char **matrix, int row);
-int 	ft_animate(t_game *game);
-
+int		ft_animate(t_game *game);
+void	ft_endgame(t_game *game, int victory);
 
 char	*get_next_line(int fd);
 char	*ft_readline(int fd, char *buffer, char *fcontent);
@@ -100,6 +99,5 @@ char	*ft_strchr(const char *s, int c);
 int		ft_strlen(char *str);
 char	*ft_freecontent(char *fcontent);
 char	*ft_extractline(char *fcontent);
-
 
 #endif

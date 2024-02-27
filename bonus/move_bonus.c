@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "so_long_bonus.h"
-
+/*#ffffff 0x87ff00*/
 void	ft_printmoves(t_game *game)
 {
 	char	*str;
@@ -21,7 +21,7 @@ void	ft_printmoves(t_game *game)
 	len = ft_strlen(str);
 	ft_put_img(game, 5, 0, 0);
 	ft_put_img(game, 5, 0, 1);
-	mlx_string_put(game->mlx, game->win, 50, 20, 0x87ff00, str);
+	mlx_string_put(game->mlx, game->win, 40, 20, 0xffffff, str);
 	write(1, str, len);
 	write(1, " move(s)\n", 9);
 	free(str);
@@ -38,9 +38,9 @@ void	ft_move_player(t_game *game, int x, int y)
 	}
 	else if (game->map[game->player.y + y][game->player.x + x] == 'E' &&
 			game->collectible == 0)
-		ft_victory(game);
+		ft_endgame(game, 1);
 	else if (game->map[game->player.y + y][game->player.x + x] == 'N')
-		ft_gameover(game);
+		ft_endgame(game, 0);
 	ft_put_img(game, 6, game->player.y, game->player.x);
 	game->player.y += y;
 	game->player.x += x;

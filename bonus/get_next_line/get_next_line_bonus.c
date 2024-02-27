@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dwilun <dwilun@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/19 11:23:54 by dwilun            #+#    #+#             */
-/*   Updated: 2024/01/27 16:30:15 by dwilun           ###   ########.fr       */
+/*   Updated: 2024/01/20 11:24:40 by dwilun           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,8 +97,12 @@ char	*get_next_line(int fd)
 	char		*buffer;
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE < 1 || read(fd, 0, 0) < 0)
+	{
+		if (fcontent)
+			return (free(fcontent), fcontent = NULL, NULL);
 		return (NULL);
+	}
 	buffer = (char *)ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!buffer)
 		return (NULL);
@@ -107,11 +111,7 @@ char	*get_next_line(int fd)
 	free(buffer);
 	line = ft_extractline(fcontent);
 	if (!line)
-	{
-		free(fcontent);
-		fcontent = NULL;
-		return (NULL);
-	}
+		return (free(fcontent), fcontent = NULL, NULL);
 	fcontent = ft_freecontent(fcontent);
 	return (line);
 }

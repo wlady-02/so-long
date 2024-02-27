@@ -84,7 +84,7 @@ int		ft_player_to_exit(char **map, t_coord start);
 int		ft_check_exit(char **map, int y, t_coord player);
 char	*ft_strtrim(char const *s1, char const *set);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
-void	ft_init_check(int argc, char **argv, t_game *game);
+void	ft_init_check(int argc, char **argv);
 void	ft_getwindowsize(t_game *game, char *fileMap);
 void	ft_printMatrix(char **matrix, int row);
 

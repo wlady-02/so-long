@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   so_long_bonus.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dwilun <dwilun@student.42.fr>              +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/16 16:46:39 by dwilun            #+#    #+#             */
-/*   Updated: 2024/01/27 16:35:18 by dwilun           ###   ########.fr       */
+/*   Created: 2024/02/26 08:39:05 by marvin            #+#    #+#             */
+/*   Updated: 2024/02/26 08:39:05 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,51 +64,46 @@ void	ft_check_img(t_game *game, int index, char *path)
 		mlx_destroy_window(game->mlx, game->win);
 		mlx_destroy_display(game->mlx);
 		free(game->mlx);
-		ft_error("Error\nTexture non valida", 6, game);
+		ft_error("Error\nTexture non valida", 9, game);
 	}
 }
 
 void	ft_init_imgs(t_game *game)
 {
-	ft_check_img(game, 0, "./textures/babbo.xpm");
-	ft_check_img(game, 1, "./textures/bab2.xpm");
-	ft_check_img(game, 2, "./textures/bab3.xpm");
-	ft_check_img(game, 3, "./textures/bab4.xpm");
-	ft_check_img(game, 4, "./textures/bab5.xpm");
-	ft_check_img(game, 5, "./textures/tree.xpm");
+	ft_check_img(game, 0, "./textures/player.xpm");
+	ft_check_img(game, 1, "./textures/player2.xpm");
+	ft_check_img(game, 2, "./textures/player3.xpm");
+	ft_check_img(game, 3, "./textures/player4.xpm");
+	ft_check_img(game, 4, "./textures/player5.xpm");
+	ft_check_img(game, 5, "./textures/wall.xpm");
 	ft_check_img(game, 6, "./textures/floor.xpm");
-	ft_check_img(game, 7, "./textures/bimbo.xpm");
-	ft_check_img(game, 8, "./textures/bim2.xpm");
+	ft_check_img(game, 7, "./textures/coll.xpm");
+	ft_check_img(game, 8, "./textures/coll2.xpm");
 	ft_check_img(game, 9, "./textures/exitc.xpm");
 	ft_check_img(game, 10, "./textures/exito.xpm");
-	ft_check_img(game, 11, "./textures/pula.xpm");
-	ft_check_img(game, 12, "./textures/pul2.xpm");
-	ft_check_img(game, 13, "./textures/pul3.xpm");
+	ft_check_img(game, 11, "./textures/enemy.xpm");
+	ft_check_img(game, 12, "./textures/enemy2.xpm");
+	ft_check_img(game, 13, "./textures/enemy3.xpm");
 }
 
-//int main(int argc, char **argv)
-int main()
+int	main(int argc, char **argv)
 {
 	t_game	*game;
 
-	/*
-	if (argc != 2)
-		return (0);
-	ft_getwindowsize(&game, argv[1]);
-	*/
-	char *argv = "./map/42.ber";
+	ft_init_check(argc, argv);
 	game = malloc(sizeof(t_game));
 	if (!game)
-		ft_error("Error\nAllocazione non riuscita", 1, game);
-	ft_getwindowsize(game, argv);
+		ft_error("Error\nAllocazione non riuscita", 4, game);
+	ft_getwindowsize(game, argv[1]);
 	game->map = (char **)malloc(sizeof(char *) * (game->y + 1));
 	if (!game->map)
-		ft_error("Error\nAllocazione non riuscita", 3, game);
-	ft_fill_map(game, argv);
+		ft_error("Error\nAllocazione non riuscita", 6, game);
+	ft_fill_map(game, argv[1]);
 	if (!ft_check_map(game))
-		ft_error("Error\nMappa non valida", 5, game);
+		ft_error("Error\nMappa non valida", 8, game);
 	game->mlx = mlx_init();
-	game->win = mlx_new_window(game->mlx, game->x*SIZE, game->y*SIZE, "so_long");
+	game->win = mlx_new_window(game->mlx, game->x * SIZE, game->y * SIZE,
+			"so_long bonus");
 	ft_init_imgs(game);
 	ft_load_images(game);
 	mlx_hook(game->win, KeyRelease, KeyReleaseMask, ft_get_input, game);

@@ -80,7 +80,7 @@ int	main(int argc, char **argv)
 {
 	t_game	*game;
 
-	ft_init_check(argc, argv, game);
+	ft_init_check(argc, argv);
 	game = malloc(sizeof(t_game));
 	if (!game)
 		ft_error("Error\nAllocazione non riuscita", 4, game);
